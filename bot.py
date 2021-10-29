@@ -62,7 +62,7 @@ def help(update,context):
     keybord1 = [[InlineKeyboardButton("👥 Group", url=f"https://t.me/{GROUP}"),
                  InlineKeyboardButton("Channel ♻️", url="https://t.me/mizotginfotel")]]
     reply_markup = InlineKeyboardMarkup(keybord1)
-    update.message.reply_text('Hi! '+str(first)+' \n\n**Hetiang hian aw...**\n➥ A hmasain Thlalak fiah tak lo thawn rawh.\n➥ Chuan Language i Select leh ang.\n➥ Chuan Messages in ka Extracted ang!', reply_markup=reply_markup)
+    update.message.reply_text('Hi! '+str(first)+' \n\n<b>Hetiang hian aw...</b>\n➥ A hmasain Thlalak fiah tak lo thawn rawh.\n➥ Chuan Language i Select leh ang.\n➥ Chuan Messages in ka Extracted ang!', reply_markup=reply_markup)
 
 
 @run_async
