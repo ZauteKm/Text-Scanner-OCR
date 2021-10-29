@@ -13,80 +13,130 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+from telegram import ChatAction,InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext.dispatcher import run_async
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters,CallbackQueryHandler,PicklePersistence
+import logging
 import os
-import pytesseract
+from functools import wraps
 import requests
-from PIL import Image
-from pyrogram import Client, filters
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from pyrogram.errors import MessageEmpty
-from pyromod import listen
 
-#pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+API_KEY = os.environ.get("API_KEY","") 
 
+TOKEN = os.environ.get("BOT_TOKEN","")
 
-BOT_TOKEN = os.environ.get("BOT_TOKEN")
-API_ID = os.environ.get("API_ID")
-API_HASH = os.environ.get("API_HASH")
+GROUP = os.environ.get("GROUP", "")
 
-Bot = Client(
-    "OCRBot",
-    bot_token = BOT_TOKEN,
-    api_id = API_ID,
-    api_hash = API_HASH
-)
+CHANNEL = os.environ.get("CHANNEL", "")
 
-START_TXT = """
-Hi {}
-I am Text Scanner OCR Bot.
+def send_typing_action(func):
+    """Sends typing action while processing func command."""
 
-> `I can extract any text from images using OCR technology. All languages supported.`
+    @wraps(func)
+    def command_func(update, context, *args, **kwargs):
+        context.bot.send_chat_action(chat_id=update.effective_message.chat_id, action=ChatAction.TYPING)
+        return func(update, context,  *args, **kwargs)
 
-Send an image to get started.
-"""
-
-START_BTN = InlineKeyboardMarkup(
-        [[
-        InlineKeyboardButton('Group', url='https://t.me/mizotelegram'),
-        InlineKeyboardButton('Channel', url='https://t.me/mizotginfotel'),
-        ]]
-    )
+    return command_func
 
 
-@Bot.on_message(filters.command(["start"]))
-async def start(bot, update):
-    text = START_TXT.format(update.from_user.mention)
-    reply_markup = START_BTN
-    await update.reply_text(
-        text=text,
-        disable_web_page_preview=True,
-        reply_markup=reply_markup
-    )
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    level=logging.INFO)
+
+logger = logging.getLogger(__name__)
 
 
-@Bot.on_message(filters.private & filters.photo)
-async def ocr(bot, msg):
-    lang_code = await bot.ask(msg.chat.id,'`Now send the ISO language code.`\n\n[List of ISO 639-2 language codes](https://en.m.wikipedia.org/wiki/List_of_ISO_639-2_codes)', filters=filters.text, parse_mode='Markdown', disable_web_page_preview=True)
-    data_url = f"https://github.com/tesseract-ocr/tessdata/raw/main/{lang_code.text}.traineddata"
-    dirs = r"/app/vendor/tessdata"
-    path = os.path.join(dirs, f"{lang_code.text}.traineddata")
-    if not os.path.exists(path):
-        data = requests.get(data_url, allow_redirects=True, headers={'User-Agent': 'Mozilla/5.0'})
-        if data.status_code == 200:
-            open(path, 'wb').write(data.content)
-        else:
-            return await msg.reply("`Either the lang code is wrong or the lang is not supported.`", parse_mode='md')
-    message = await msg.reply("`Downloading and Extracting...`", parse_mode='md')
-    image = await msg.download(file_name=f"text_{msg.from_user.id}.jpg")
-    img = Image.open(image)
-    text = pytesseract.image_to_string(img, lang=f"{lang_code.text}")
-    try:
-        await msg.reply(text[:-1], quote=True, disable_web_page_preview=True)
-    except MessageEmpty:
-        return await msg.reply("`Either the image has no text or the text is not recognizable.`", quote=True, parse_mode='md')
-    await message.delete()
-    os.remove(image)
+@run_async     
+@send_typing_action
+def start(update,context):
+    """Send a message when the command /start is issued."""
+    global first
+    first=update.message.chat.first_name
+    keybord1 = [[InlineKeyboardButton("👥 Group", url=f"https://t.me/{GROUP}"),
+                 InlineKeyboardButton("Channel ♻️", url="https://t.me/{CHANNEL}")]]
+    reply_markup = InlineKeyboardMarkup(keybord1)
+    update.message.reply_text('Hi! '+str(first)+' \n\nWelcome to OCR Bot.\n\nJust send a clear image to me and i will recognize the text in the image and send it as a message!\n\nCheck /help for more...\n\nCreate your Own Bot by Watching Tutorial', reply_markup=reply_markup)
+
+def help(update,context):
+    """Send a message when the command /help is issued."""
+    global first
+    first=update.message.chat.first_name
+    keybord1 = [[InlineKeyboardButton("👥 Group", url=f"https://t.me/{GROUP}"),
+                 InlineKeyboardButton("Channel ♻️", url="https://t.me/{CHANNEL}")]]
+    reply_markup = InlineKeyboardMarkup(keybord1)
+    update.message.reply_text('Hi! '+str(first)+' \n\nFollow these steps...\n➥ First Send me a Clear Image to me \n➥ Select the Language to Extract Selected Language Text in Image \n➥ Extracted Text is Uploaded as Message!', reply_markup=reply_markup)
 
 
-    
-Bot.run()
+@run_async
+@send_typing_action
+def convert_image(update,context):
+        file_id = update.message.photo[-1].file_id
+        newFile=context.bot.get_file(file_id)
+        file= newFile.file_path
+        context.user_data['filepath']=file
+        keyboard =  [[InlineKeyboardButton("Arabic", callback_data='ara'),
+                      InlineKeyboardButton("Bulgarian", callback_data='bul'),
+                      InlineKeyboardButton("Chinese", callback_data='chs')
+                     ],
+                     [
+                     InlineKeyboardButton("Croatian", callback_data='hrv'),
+                     InlineKeyboardButton("Danish", callback_data='dan'),
+                     InlineKeyboardButton("Dutch", callback_data='dut')
+                     ],
+                     [
+                     InlineKeyboardButton("English", callback_data='eng'),
+                     InlineKeyboardButton("Finnish", callback_data='fin'),
+                     InlineKeyboardButton("French", callback_data='fre')
+                     ],
+                     [
+                     InlineKeyboardButton("German", callback_data='ger'),
+                     InlineKeyboardButton("Greek", callback_data='gre'),
+                     InlineKeyboardButton("Hungarian", callback_data='hun')
+                     ],
+                     [
+                     InlineKeyboardButton("Korean", callback_data='kor'),
+                     InlineKeyboardButton("Italian", callback_data='ita'),
+                     InlineKeyboardButton("Japanese", callback_data='jpn')
+                     ],
+                     [
+                     InlineKeyboardButton("Polish", callback_data='pol'),
+                     InlineKeyboardButton("Portuguese", callback_data='por'),
+                     InlineKeyboardButton("Russian", callback_data='rus')
+                     ],
+                     [
+                     InlineKeyboardButton("Spanish", callback_data='spa'),
+                     InlineKeyboardButton("Swedish", callback_data='swe'),
+                     InlineKeyboardButton("Turkish", callback_data='tur')
+                     ]]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        update.message.reply_text("Select the Language Here 👇", reply_markup=reply_markup)
+
+@run_async
+def button(update,context):
+    filepath=context.user_data['filepath']
+    query = update.callback_query
+    query.answer()
+    query.edit_message_text("Extracting Text....")
+    data=requests.get(f"https://api.ocr.space/parse/imageurl?apikey={API_KEY}&url={filepath}&language={query.data}&detectOrientation=True&filetype=JPG&OCREngine=1&isTable=True&scale=True")
+    data=data.json()
+    if data['IsErroredOnProcessing']==False:
+        message=data['ParsedResults'][0]['ParsedText']
+        query.edit_message_text(f"{message}")
+    else:
+        query.edit_message_text(text="⚠️ Something went wrong")
+
+persistence=PicklePersistence('userdata')
+def main():
+    token=TOKEN 
+    updater = Updater(token,use_context=True,persistence=persistence)
+    dp=updater.dispatcher
+    dp.add_handler(CommandHandler('start',start))
+    dp.add_handler(CommandHandler('help',help))
+    dp.add_handler(MessageHandler(Filters.photo, convert_image))
+    dp.add_handler(CallbackQueryHandler(button))
+    updater.start_polling(clean=True)
+    updater.idle()
+ 
+	
+if __name__=="__main__":
+	main()
