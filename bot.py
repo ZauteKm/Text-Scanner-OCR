@@ -27,8 +27,6 @@ TOKEN = os.environ.get("BOT_TOKEN","")
 
 GROUP = os.environ.get("GROUP", "")
 
-CHANNEL = os.environ.get("CHANNEL", "")
-
 def send_typing_action(func):
     """Sends typing action while processing func command."""
 
@@ -53,18 +51,18 @@ def start(update,context):
     global first
     first=update.message.chat.first_name
     keybord1 = [[InlineKeyboardButton("👥 Group", url=f"https://t.me/{GROUP}"),
-                 InlineKeyboardButton("Channel ♻️", url="https://t.me/{CHANNEL}"),]]
+                 InlineKeyboardButton("Channel ♻️", url="https://t.me/mizotginfotel")]]
     reply_markup = InlineKeyboardMarkup(keybord1)
-    update.message.reply_text('Hi! '+str(first)+' \n\nWelcome to OCR Bot.\n\nJust send a clear image to me and i will recognize the text in the image and send it as a message!\n\nCheck /help for more', reply_markup=reply_markup)
+    update.message.reply_text('<b>Hi! '+str(mention)+' \n\nText Scanner OCR Bot ah ka lo lâwm a che.</b>\n\nThlalak fiah fel takin lo thawnla, i Picture chhunga thuziak ho kha ka la chhuak thei!\n\n<b>Ila hriatthiam loh fo chuan /help lo thawn rawh.</b>', reply_markup=reply_markup)
 
 def help(update,context):
     """Send a message when the command /help is issued."""
     global first
     first=update.message.chat.first_name
     keybord1 = [[InlineKeyboardButton("👥 Group", url=f"https://t.me/{GROUP}"),
-                 InlineKeyboardButton("Channel ♻️", url="https://t.me/{CHANNEL}"),]]
+                 InlineKeyboardButton("Channel ♻️", url="https://t.me/mizotginfotel")]]
     reply_markup = InlineKeyboardMarkup(keybord1)
-    update.message.reply_text('Hi! '+str(first)+' \n\nFollow these steps...\n➥ First Send me a Clear Image to me \n➥ Select the Language to Extract Selected Language Text in Image \n➥ Extracted Text is Uploaded as Message!', reply_markup=reply_markup)
+    update.message.reply_text('Hi! '+str(mention)+' \n\n**Hetiang hian aw...**\n➥ A hmasain Thlalak fiah tak lo thawn rawh.\n➥ Chuan Language i Select leh ang.\n➥ Chuan Messages in ka Extracted ang!', reply_markup=reply_markup)
 
 
 @run_async
