@@ -53,16 +53,16 @@ def start(update,context):
     global first
     first=update.message.chat.first_name
     keybord1 = [[InlineKeyboardButton("👥 Group", url=f"https://t.me/{GROUP}"),
-                 InlineKeyboardButton("Channel ♻️", url="https://t.me/{CHANNEL}")]]
+                 InlineKeyboardButton("Channel ♻️", url="https://t.me/{CHANNEL}"),]]
     reply_markup = InlineKeyboardMarkup(keybord1)
-    update.message.reply_text('Hi! '+str(first)+' \n\nWelcome to OCR Bot.\n\nJust send a clear image to me and i will recognize the text in the image and send it as a message!\n\nCheck /help for more...\n\nCreate your Own Bot by Watching Tutorial', reply_markup=reply_markup)
+    update.message.reply_text('Hi! '+str(first)+' \n\nWelcome to OCR Bot.\n\nJust send a clear image to me and i will recognize the text in the image and send it as a message!\n\nCheck /help for more', reply_markup=reply_markup)
 
 def help(update,context):
     """Send a message when the command /help is issued."""
     global first
     first=update.message.chat.first_name
     keybord1 = [[InlineKeyboardButton("👥 Group", url=f"https://t.me/{GROUP}"),
-                 InlineKeyboardButton("Channel ♻️", url="https://t.me/{CHANNEL}")]]
+                 InlineKeyboardButton("Channel ♻️", url="https://t.me/{CHANNEL}"),]]
     reply_markup = InlineKeyboardMarkup(keybord1)
     update.message.reply_text('Hi! '+str(first)+' \n\nFollow these steps...\n➥ First Send me a Clear Image to me \n➥ Select the Language to Extract Selected Language Text in Image \n➥ Extracted Text is Uploaded as Message!', reply_markup=reply_markup)
 
