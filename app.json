@@ -1,25 +1,26 @@
 {
-  "name": "Text-Scanner-OCR",
-  "env": {
-    "API_ID": {
-      "description": "Add your telegram API_ID",
-      "value": ""
-    },
-    "API_HASH": {
-      "description": "Add your telegram API_HASH",
-      "value": ""
-    },
-    "BOT_TOKEN": {
-      "description": "Your bot token, as a string.",
-      "value": ""
-}
-  },
-  "buildpacks": [
-    {
-      "url": "https://github.com/samadii/heroku-buildpack-tesseract"
-    },
-    {
-      "url": "heroku/python"
+    "name": "Text-Scanner-OCR",
+    "description": "Telegram Bot to Extract Text from Image",
+    "repository": "https://github.com/Zautekm/Text-Scanner-OCR",
+    "logo": "https://telegra.ph/file/f48ff733ca4d1621a4097.jpg",
+    "keywords": ["josprojects", "ocr", "Text Extractor", "Optical Character Recognition"],
+    "env":{
+        "BOT_TOKEN":{
+            "description":"Your Bot Token from @Botfather",
+            "required":"True"
+        },
+        "API_KEY":{
+            "description":"Your Api key from https://ocr.space/ocrapi",
+            "required":"True"
+        },
+        "GROUP":{
+            "description":"Your Group Username without '@'",
+            "required":"True"
+        },
+        "CHANNEL":{
+            "description":"Your Channel Username without '@'",
+            "required":"True"
+        }
     }
-  ]
+
 }
